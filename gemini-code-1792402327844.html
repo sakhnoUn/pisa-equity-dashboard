@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PISA Equity Dashboard & Policy Simulator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans pb-12">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 py-4 px-6 mb-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          PISA Educational Equity Dashboard
+        </h1>
+        <p class="text-slate-400 text-sm">Аналіз освітньої нерівності та симулятор рішень</p>
+      </div>
+      <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        Дані: PISA Dataset
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 space-y-8">
+
+    <!-- Section 1: The Social Issue -->
+    <section class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 backdrop-blur">
+      <div class="mb-6">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+          Соціальна проблема
+        </span>
+        <h2 class="text-xl font-bold mt-2 text-slate-100">Нерівність освітніх можливостей (Socio-Economic Gap)</h2>
+        <p class="text-slate-400 text-sm mt-1">
+          Діти із сімей із низьким соціально-економічним статусом (Q1) стабільно отримують нижчі бали через бідність та міжшкільну сегрегацію.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">Середній розрив Q4–Q1</p>
+          <p class="text-3xl font-extrabold text-red-400 mt-1">~75–99 <span class="text-sm font-normal text-slate-400">балів</span></p>
+          <p class="text-xs text-slate-500 mt-1">Еквівалент 2 років шкільного навчання</p>
+        </div>
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">Міжшкільна сегрегація (ICC)</p>
+          <p class="text-3xl font-extrabold text-amber-400 mt-1">28–49%</p>
+          <p class="text-xs text-slate-500 mt-1">Дисперсії результатів лежить між школами</p>
+        </div>
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-medium">Академічна стійкість (Resilience)</p>
+          <p class="text-3xl font-extrabold text-cyan-400 mt-1">&lt; 4%</p>
+          <p class="text-xs text-slate-500 mt-1">Бідних дітей досягають найвищого рівня (Level 5+)</p>
+        </div>
+      </div>
+
+      <!-- Graph 1 -->
+      <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 h-72">
+        <canvas id="issueChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Section 2: Interactive Solution Simulator -->
+    <section class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 backdrop-blur">
+      <div class="mb-6">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          Пропоноване рішення
+        </span>
+        <h2 class="text-xl font-bold mt-2 text-slate-100">Симулятор освітньої політики (Policy Impact Simulator)</h2>
+        <p class="text-slate-400 text-sm mt-1">
+          Змінюйте параметри державної політики, щоб побачити, як зменшується освітній розрив та зростає результат найбідніших учнів.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Controls -->
+        <div class="lg:col-span-5 space-y-6 bg-slate-900/80 p-5 rounded-xl border border-slate-800">
+          
+          <!-- Slider 1 -->
+          <div>
+            <div class="flex justify-between text-sm mb-2">
+              <label for="desegregation" class="font-medium text-slate-300">Десегрегація шкіл (Зменшення ICC):</label>
+              <span id="desegregationVal" class="text-cyan-400 font-bold">0%</span>
+            </div>
+            <input type="range" id="desegregation" min="0" max="100" value="0" 
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+            <p class="text-xs text-slate-500 mt-1">Зменшення розшарування дітей за багатством між школами</p>
+          </div>
+
+          <!-- Slider 2 -->
+          <div>
+            <div class="flex justify-between text-sm mb-2">
+              <label for="support" class="font-medium text-slate-300">Адресна підтримка вразливих сімей:</label>
+              <span id="supportVal" class="text-emerald-400 font-bold">0%</span>
+            </div>
+            <input type="range" id="support" min="0" max="100" value="0" 
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-400">
+            <p class="text-xs text-slate-500 mt-1">Забезпечення книжками, гаджетами та безкоштовними гуртками</p>
+          </div>
+
+          <!-- Slider 3 -->
+          <div>
+            <div class="flex justify-between text-sm mb-2">
+              <label for="resourcing" class="font-medium text-slate-300">Вирівнювання ресурсів шкіл:</label>
+              <span id="resourcingVal" class="text-purple-400 font-bold">0%</span>
+            </div>
+            <input type="range" id="resourcing" min="0" max="100" value="0" 
+              class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-400">
+            <p class="text-xs text-slate-500 mt-1">Додаткове фінансування для підтримання шкіл у бідних районах</p>
+          </div>
+
+          <button id="resetBtn" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition border border-slate-700">
+            Скинути параметри
+          </button>
+        </div>
+
+        <!-- Simulation Graph -->
+        <div class="lg:col-span-7 bg-slate-900/60 p-4 rounded-xl border border-slate-800 h-80">
+          <canvas id="solutionChart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Initial Data
+    const baseQ1 = 410;
+    const baseQ2 = 445;
+    const baseQ3 = 475;
+    const baseQ4 = 515;
+
+    // Chart 1: Issue Chart
+    const ctxIssue = document.getElementById('issueChart').getContext('2d');
+    new Chart(ctxIssue, {
+      type: 'bar',
+      data: {
+        labels: ['Q1 (Найбідніші)', 'Q2', 'Q3', 'Q4 (Найбагатші)'],
+        datasets: [{
+          label: 'Бали PISA з математики',
+          data: [baseQ1, baseQ2, baseQ3, baseQ4],
+          backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'],
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Бали PISA за квартилями сімейного статусу (ESCS)', color: '#94a3b8' }
+        },
+        scales: {
+          y: { min: 300, max: 600, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+          x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+
+    // Chart 2: Solution Simulator Chart
+    const ctxSolution = document.getElementById('solutionChart').getContext('2d');
+    const solutionChart = new Chart(ctxSolution, {
+      type: 'line',
+      data: {
+        labels: ['Початковий стан', 'Після впровадження реформ'],
+        datasets: [
+          {
+            label: 'Найбідніші (Q1)',
+            data: [baseQ1, baseQ1],
+            borderColor: '#ef4444',
+            backgroundColor: '#ef4444',
+            borderWidth: 3,
+            tension: 0.2
+          },
+          {
+            label: 'Найбагатші (Q4)',
+            data: [baseQ4, baseQ4],
+            borderColor: '#10b981',
+            backgroundColor: '#10b981',
+            borderWidth: 3,
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: '#cbd5e1' } },
+          title: { display: true, text: 'Прогнозоване скорочення освітнього розриву', color: '#94a3b8' }
+        },
+        scales: {
+          y: { min: 350, max: 550, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+          x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+
+    // Interactive Logic
+    const desegregationInput = document.getElementById('desegregation');
+    const supportInput = document.getElementById('support');
+    const resourcingInput = document.getElementById('resourcing');
+
+    function updateSimulation() {
+      const v1 = parseInt(desegregationInput.value);
+      const v2 = parseInt(supportInput.value);
+      const v3 = parseInt(resourcingInput.value);
+
+      document.getElementById('desegregationVal').innerText = v1 + '%';
+      document.getElementById('supportVal').innerText = v2 + '%';
+      document.getElementById('resourcingVal').innerText = v3 + '%';
+
+      // Formula for score boost
+      const boostQ1 = (v1 * 0.45) + (v2 * 0.35) + (v3 * 0.15);
+      const newQ1 = Math.min(baseQ4 - 15, Math.round(baseQ1 + boostQ1));
+
+      solutionChart.data.datasets[0].data[1] = newQ1;
+      solutionChart.update();
+    }
+
+    desegregationInput.addEventListener('input', updateSimulation);
+    supportInput.addEventListener('input', updateSimulation);
+    resourcingInput.addEventListener('input', updateSimulation);
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      desegregationInput.value = 0;
+      supportInput.value = 0;
+      resourcingInput.value = 0;
+      updateSimulation();
+    });
+  </script>
+</body>
+</html>
